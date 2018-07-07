@@ -5,6 +5,7 @@
 
 // #include "TagValue.h"
 #include "../common.hpp"
+#include <boost/serialization/shared_ptr.hpp>
 
 namespace wave{
   namespace data{
@@ -73,7 +74,6 @@ namespace wave{
         , strike(0)
         , include_expired(false)
         , combo_legs(NULL)
-        , delta_neutral_contract(NULL)
       {
       }
 
@@ -106,7 +106,7 @@ namespace wave{
       comboleg_list_ptr combo_legs;
 
       // delta neutral contract
-      delta_neutral_contract* delta_neutral_contract;
+      // delta_neutral_contract* delta_neutral_contract;
 
       static contract stk(std::string t_symbol,
               std::string t_currency,
@@ -156,13 +156,6 @@ namespace wave{
     };
     
     typedef ptr_type<contract> contract_ptr;
-
-    struct contract_description
-    {
-      contract contract;
-      typedef std::vector<std::string> derivative_sec_types_list;
-      derivative_sec_types_list derivative_sec_types;
-    };
 
   }
 }

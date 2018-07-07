@@ -2,34 +2,43 @@
 #ifndef __DATA_SUBSCRIBER_HPP__
 #define __DATA_SUBSCRIBER_HPP__
 
-#include "data_source_base.hpp"
 #include "../common.hpp"
-#include "data_source_manager.hpp"
+#include "../semaphore.hpp"
+
+#include "contract.hpp"
+#include "tick.hpp"
+#include "data_source_base.hpp"
+#include <boost/thread.hpp>
 
 namespace wave{
   namespace data{
     // create a thread for each data source.
     class data_subscriber {
     private:
-      data_source_manager m_ds_manager;
-      void init_data_sources();
-      void start_data_sources();
-      void feed_tick(wave::data::tick& t);
-      void event_loop();
-      void on_data();
-
-    protect:
-
-      //! an event function raised by data_source
-      void virtual on_data(){}
+      bool m_if_handle_data;
       
-      tick& tick(int8 id){
-        
-      }
+      void on_data_thread();
 
-      bar& bar(int8 id){
+      wave::semaphore m_data_signal;
+      boost::thread m_data_thread;
+
+      //! prepare necessary data, e.g. historical data
+      //! according to the data subscription
+      void prepare_data();
+      
+    protected:
+      virtual void initialize() = 0;
+      virtual void handle_data() = 0;
+      
+      //! an event function raised by data_source
+      
+      // tick& get_tick(int8 id){
         
-      }
+      // }
+
+      // bar& get_bar(int8 id){
+        
+      // }
       
       //! subscribe the bar data.
       //! symbols are of format like "US/AAPL",
@@ -37,23 +46,23 @@ namespace wave{
       //! is the stock symbol.
       int8 subscribe_bar(const contract ctr,
               const std::string period,
-              const std::string data_source,
-              const tag_values params){
-        m_ds_manager.get_data_source(data_source) ->
-          subscribe_bar(this, ctr, period);
-      };
+              const time_type start,
+              const std::string data_source);
 
       int8 subscribe_tick(const contract ctr,
-              const std::string data_source,
-              const tag_values params){
-        m_ds_manager.get_data_source(data_source) ->
-          subscribe_tick(this, ctr);
-      };
+              const std::string data_source);
 
+      
     public:
-      data_subscriber(){
-        
-      }
+
+      data_subscriber();
+      
+      //! start data soruces and data event loop
+      virtual void start();
+      
+      virtual void wait_stop();
+
+      virtual void send_stop_signal();
       
       void req_hist_bar(std::string symbol,
               std::string type,

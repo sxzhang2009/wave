@@ -14,5 +14,7 @@
 #include "data/order.hpp"
 #include "data/contract.hpp"
 #include "data/tick.hpp"
+#include "strategy/strategy_manager.hpp"
+#include "utils.hpp"
 
 #endif

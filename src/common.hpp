@@ -2,6 +2,8 @@
 #ifndef __COMMON_HPP__
 #define __COMMON_HPP__
 
+#define BOOST_LOG_DYN_LINK
+
 #include <string>
 #include <chrono>
 #include <sstream>
@@ -9,6 +11,10 @@
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/filesystem.hpp>
+
+#include <unordered_map>
 
 namespace wave{
   typedef std::chrono::system_clock clock;
@@ -38,4 +44,13 @@ namespace wave{
   typedef std::unordered_map<std::string,std::string> tag_values;
 
 }
+
+#include <boost/exception/all.hpp>
+
+#define LOGIC_ERROR(x)                          \
+  BOOST_THROW_EXCEPTION(std::logic_error(x))
+
+#define RUNTIME_ERROR(x)                        \
+  BOOST_THROW_EXCEPTION(std::runtime_error(x))
+
 #endif

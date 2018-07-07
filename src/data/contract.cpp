@@ -64,7 +64,7 @@ namespace wave{
         const comboleg* leg = iter->get();
         if (!leg)
           continue;
-        dst->push_back(combo_legs_ptr(new comboleg(*leg)));
+        dst->push_back(comboleg_ptr(new comboleg(*leg)));
       }
     }
     

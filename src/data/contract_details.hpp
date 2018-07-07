@@ -77,7 +77,7 @@ namespace wave{
       template<class Archive>
       void serialize(Archive & ar, const unsigned int version)
       {
-        ar & m_contract;             
+        ar & contract;             
         ar & market_name;           
         ar & min_tick;              
         ar & order_types;           
@@ -123,3 +123,5 @@ namespace wave{
     
   }
 }
+
+#endif

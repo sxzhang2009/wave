@@ -1,6 +1,9 @@
 
+// #define BOOST_LOG_DYN_LINK 1
 
 #include "../src/wave.hpp"
+#include "../src/semaphore.hpp"
+
 #include <unistd.h>
 
 void test_datetime(){
@@ -113,6 +116,9 @@ void test_ohlc(){
   o.append_bar(bar(tp2, 101.0, 102.0, 100.0, 100.3));
   o.append_bar(bar(tp3, 102.0, 103.0, 100.0, 100.4));
 
+  o.append_bar({tp1, 100.0, 101.0, 99.0,  100.2});
+
+  
   o.print();
 
   std::string s = "USDJPY";
@@ -134,8 +140,9 @@ void test_contract(){
   contract c4 = contract::index("VIX", "USD", "CBOE");
 }
 
+
 ///! test semaphore
-semaphore s;
+wave::semaphore s;
 using namespace std::chrono;
 
 system_clock::time_point start;
@@ -186,11 +193,49 @@ void test_semaphore(){
   }
 }
 
+
+#include "../src/data/data_source_manager.hpp"
+void test_data_source_manager(){
+  wave::data::data_source_manager::global()->
+    get_data_source("ib-data")->
+    connect();
+
+  wave::data::data_source_manager::global()->
+    start_data_sources();  
+}
+
+#include <boost/any.hpp>
+void test_boost_any(){
+  using namespace boost;
+  using namespace std;
+  
+  any a = 1;
+  cout<< any_cast<int>(a)<<"\n";
+
+  map<string, any> map_any;
+  map_any["A"] = string("hello!");
+  map_any["B"] = float(1.2);
+  map_any["C"] = true;
+
+  cout<< any_cast<string>(map_any["A"]) << std::endl;
+  cout<< any_cast<float>(map_any["B"]) << std::endl;
+  cout<< any_cast<bool>(map_any["C"]) << std::endl;
+  
+}
+
+void test_strategy(){
+  wave::strategy::strategy_manager::run_strategy();
+}
+
 int main(){
-  test_datetime();    
-  test_data_frame();
-  test_ohlc();
-  test_order();
-  test_contract();
-  test_semaphore();
+  // test_datetime();    
+  // test_data_frame();
+  // test_ohlc();
+  // test_order();
+  // test_contract();
+  // test_semaphore();
+  // test_boost_any();
+  //test_data_source_manager();
+
+  test_strategy();
 }

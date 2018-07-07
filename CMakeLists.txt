@@ -1,22 +1,59 @@
 cmake_minimum_required (VERSION 3.0.2)
 project (wave_project)
 
+## configure boost library
 set(Boost_USE_STATIC_LIBS ON) 
-find_package(Boost)
+find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
+link_directories(${Boost_LIBRARY_DIRS})
 
+## find python library
+find_package(PythonLibs 2.7 REQUIRED)
+include_directories(${PYTHON_INCLUDE_PATH})
+
+add_subdirectory(src)
+message(STATUS ${LIB_SRC})
+
+#find all cpp files
 FILE(GLOB_RECURSE SRC  src/*.cpp)
 
+# message(STATUS ${SRC})
 
+# add_executable(wave.exe ${SRC})
 add_library(wave SHARED ${SRC})
 
 # add_subdirectory(required/glog)
 # target_link_libraries(wave glog::glog)
 
-target_link_libraries(wave ${Boost_LIBRARIES})
+# target_link_libraries(wave.exe
+#   boost_log  
+#   boost_log_setup
+#   boost_thread
+#   boost_system
+#   boost_filesystem
+#   pthread
+#   dl
+#   ${PYTHON_LIBRARIES} boost_python27)
 
-FILE(GLOB_RECURSE TEST_SRC  test/*.cpp)
-add_executable(unittest ${TEST_SRC})
-target_link_libraries(unittest wave)
+target_link_libraries(wave
+  boost_log_setup  
+  boost_log  
+  boost_thread
+  boost_system
+  boost_filesystem
+  pthread
+  dl
+  ${PYTHON_LIBRARIES} boost_python27)
+
+# FILE(GLOB_RECURSE TEST_SRC  test/*.cpp)
+
+add_subdirectory(test)
+
+# add_executable(unittest ${TEST_SRC})
+# target_link_libraries(unittest optimized
+#   wave
+#   boost_log_setup
+#   boost_log)
 
 
 SET(CMAKE_CXX_FLAGS  "-std=c++0x" )

@@ -4,15 +4,16 @@
 
 // #include "TagValue.h"
 #include "../common.hpp"
+#include <boost/any.hpp>
 
 namespace wave{
   namespace data{
     using namespace std;
-    class account{
-    public:
-      string code;
-      double net_value;
-    }
+
+    // typedef std::unordered_map<std::string, boost::any>
+    typedef std::unordered_map<std::string, boost::any>
+    account;
+    
   }
 }
 

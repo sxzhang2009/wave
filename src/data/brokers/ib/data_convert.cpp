@@ -8,7 +8,7 @@
 #include "../../bar.hpp"
 #include "../../tick.hpp"
 #include "../../order.hpp"
-#include "../../contract.hpp"
+#include "../../contract_details.hpp"
 
 using namespace wave;
 

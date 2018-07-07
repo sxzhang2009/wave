@@ -3,13 +3,14 @@
 #include <boost/python.hpp>
 
 using namespace wave::data;
+using namespace boost::python;
 
-BOOST_PYTHON_MODULE(wave)
+BOOST_PYTHON_MODULE(libwave)
 {
   class_<contract>("contract")
     .def_readwrite("con_id", &contract::con_id)
     .def_readwrite("symbol", &contract::symbol)            
-    .def_readwrite("sec_type", &contract::set_type)
+    .def_readwrite("sec_type", &contract::sec_type)
     .def_readwrite("last_trade_date", &contract::last_trade_date)   
     .def_readwrite("strike", &contract::strike)            
     .def_readwrite("right", &contract::right) 

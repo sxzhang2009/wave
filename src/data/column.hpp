@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include "../common.hpp"
+#include <boost/pointer_cast.hpp>
 
 namespace wave{
   namespace data{
@@ -46,14 +47,14 @@ namespace wave{
       template<class T>
       std::vector<T>* as(){
         // static_pointer_cast<std::vector<T>
-        return std::static_pointer_cast<std::vector<T> >(m_values).get();
+        return boost::static_pointer_cast<std::vector<T> >(m_values).get();
         // return (std::vector<T>*)m_values->data();
       }
 
       template<class T>
       ptr_type<std::vector<T> > as_vec(){
         // static_pointer_cast<std::vector<T>
-        return std::static_pointer_cast<std::vector<T> >(m_values);
+        return boost::static_pointer_cast<std::vector<T> >(m_values);
         // return (std::vector<T>*)m_values->data();
       }
       
