@@ -22,13 +22,26 @@ namespace wave{
       wave::semaphore m_data_signal;
       boost::thread m_data_thread;
 
+      //! called after data source started
+      //! but before initialization function.
+      void pre_initialization();
+      
       //! prepare necessary data, e.g. historical data
       //! according to the data subscription
       void prepare_data();
+
+    protected:
+      account_map accounts;
       
     protected:
       virtual void initialize() = 0;
       virtual void handle_data() = 0;
+
+      //! get current time from local or from data_source.
+      virtual time_type current_time(
+          const std::string data_source = "");
+
+      virtual void update_account();
       
       //! an event function raised by data_source
       
@@ -39,6 +52,7 @@ namespace wave{
       // bar& get_bar(int8 id){
         
       // }
+
       
       //! subscribe the bar data.
       //! symbols are of format like "US/AAPL",

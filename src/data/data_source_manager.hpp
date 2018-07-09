@@ -41,6 +41,14 @@ namespace wave{
       //! get a global data source manager instance.
       static ptr_type<data_source_manager> global();
 
+      vec_string available_data_sources(){
+        vec_string list;
+        for(auto& a : m_ds){
+          list.push_back(a.first);
+        }
+        return list;
+      }
+      
       //! constructor
       data_source_manager();
 
@@ -53,7 +61,7 @@ namespace wave{
       //! get a data source object from a given name
       data_source_ptr get_data_source(
           const std::string ds_name);
-
+      
       //! start data source loop
       void start_data_sources();
 

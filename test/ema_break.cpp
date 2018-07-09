@@ -14,7 +14,16 @@ public:
     strategy_base(t_name){}
   
   void initialize(){
-    
+    BOOST_LOG_TRIVIAL(info)
+      << "current time is :"
+      << wave::utils::strftime(current_time());
+
+    BOOST_LOG_TRIVIAL(info)
+      << "current time from data source is :"
+      << wave::utils::strftime(current_time("ib-data"));
+
+    std::cout<<"net value is "
+             << accounts["ib-data"].net_value;
   }
   
   void handle_data(){

@@ -224,10 +224,17 @@ void test_boost_any(){
 }
 
 void test_strategy(){
+  wave::initialize();
   wave::strategy::strategy_manager::run_strategy();
 }
 
+#include <boost/variant.hpp>
+#include <string>
+#include <iostream>
+
+
 int main(){
+  
   // test_datetime();    
   // test_data_frame();
   // test_ohlc();

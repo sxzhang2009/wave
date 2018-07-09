@@ -7,21 +7,24 @@
 namespace wave{
   namespace data{
     namespace ib{
-
-      data_source::data_source(tag_values& tv):
-        m_client(new EClientSocket(this, &m_signal)),
-        m_tv(tv){
+      using namespace wave::data;
+      
+      data_source::data_source(
+          const std::string t_name,
+          tag_values& t_configs):
+        data_source_base(t_name, t_configs),
+        m_client(new EClientSocket(this, &m_signal)){
       }
 
       void data_source::connect() {
         using namespace std;
-        string host = m_tv["host"];
-        int port = std::stoi(m_tv["port"]);
+        string host = m_configs["host"];
+        int port = std::stoi(m_configs["port"]);
         int client_id = 1;
 
-        tag_values::iterator it = m_tv.find("client_id");
+        tag_values::iterator it = m_configs.find("client_id");
         
-        if(it != m_tv.end())
+        if(it != m_configs.end())
           client_id = std::stoi(it->second);
           
         BOOST_LOG_TRIVIAL(info) << "connecting to " << host
@@ -68,9 +71,121 @@ namespace wave{
         }
       }
 
-      //  req_account_summary(){
+      time_type data_source::current_time(){
+        m_client->reqCurrentTime();
+        m_req_current_time_signal.wait();
+        return m_current_time;
+      }
+      
+      void data_source::update_account(account& acc){
         
-      // };
+        m_num_account_summary_response =
+          AccountSummaryTags::get()->getNumTags();
+        
+        m_client->reqAccountSummary(9001, "All",
+                AccountSummaryTags::get()->getAllTags());
+        
+        m_req_account_summary_signal.wait();
+
+        //! fill account structure
+        account_summary::iterator it;
+        
+        it = m_account_summary.find("AccountType");
+        if(it != m_account_summary.end()){
+          acc.name = it->second;
+        }
+
+        it = m_account_summary.find("NetLiquidation");
+        if(it != m_account_summary.end()){
+          acc.net_value = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("TotalCashValue");
+        if(it != m_account_summary.end()){
+          acc.total_cash = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("SettledCash");
+        if(it != m_account_summary.end()){
+          acc.settled_cash = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("AccruedCash");
+        if(it != m_account_summary.end()){
+          acc.accrued_cash = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("BuyingPower");
+        if(it != m_account_summary.end()){
+          acc.buying_power = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("EquityWithLoanValue");
+        if(it != m_account_summary.end()){
+          acc.equity_with_load = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("PreviousEquityWithLoanValue");
+        if(it != m_account_summary.end()){
+          acc.previous_equity_with_load = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("GrossPositionValue");
+        if(it != m_account_summary.end()){
+          acc.gross_possition_value = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("ReqTEquity");
+        if(it != m_account_summary.end()){
+          acc.reqt_equity = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("ReqTMargin");
+        if(it != m_account_summary.end()){
+          acc.reqt_margin = std::stod(it->second);
+        }
+        
+        it = m_account_summary.find("SMA");
+        if(it != m_account_summary.end()){
+          acc.sma = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("InitMarginReq");
+        if(it != m_account_summary.end()){
+          acc.init_margin_req = std::stod(it->second);
+        }
+        
+        it = m_account_summary.find("MaintMarginReq");
+        if(it != m_account_summary.end()){
+          acc.maint_margin_req = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("AvailableFunds");
+        if(it != m_account_summary.end()){
+          acc.available_funds = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("ExcessLiquidity");
+        if(it != m_account_summary.end()){
+          acc.excess_liquidity = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("Cushion");
+        if(it != m_account_summary.end()){
+          acc.cushion = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("DayTradesRemaining");
+        if(it != m_account_summary.end()){
+          acc.day_trade_remaining = std::stod(it->second);
+        }
+
+        it = m_account_summary.find("Leverage");
+        if(it != m_account_summary.end()){
+          acc.leverage = std::stod(it->second);
+        }
+
+      };
 
       //////////////////////////////////////
       void data_source::tickPrice(TickerId tickerId, TickType field,
@@ -134,8 +249,8 @@ namespace wave{
 
       void data_source::nextValidId(OrderId orderId){
         std::cout<<"order Id = "<< orderId << std::endl;
-        m_client->reqAccountSummary(9001, "All",
-                AccountSummaryTags::getAllTags());
+        // m_client->reqAccountSummary(9001, "All",
+        //         AccountSummaryTags::getAllTags());
       };
       
       void data_source::contractDetails(int reqId,
@@ -169,6 +284,7 @@ namespace wave{
               const string& originExch){};
       
       void data_source::managedAccounts(const string& accountsList){};
+      
       void data_source::receiveFA(faDataType pFaDataType,
               const string& cxml){};
       
@@ -191,7 +307,11 @@ namespace wave{
               double open, double high, double low, double close,
               long volume, double wap, int count){};
       
-      void data_source::currentTime(long time){};
+      void data_source::currentTime(long time){
+        m_current_time =
+          wave::utils::intptime((int8)time*1E6);
+        m_req_current_time_signal.notify();
+      };
       
       void data_source::fundamentalData(TickerId reqId,
               const string& data){};
@@ -213,13 +333,27 @@ namespace wave{
 
       void data_source::accountSummary(int reqId, const string& account,
               const string& tag, const string& value, const string& curency){
+
+        // m_account_summary["tag"] = value;
+        m_account_summary[tag] = value;
         
-        std::cout<< " redId = " << reqId
-                 << " account = " << account
-                 << " tag = " << tag
-                 << " value = " << value
-                 << " curency = " << curency
-                 << std::endl;
+        m_num_account_summary_response--;
+
+        // std::cout<<tag <<" : "
+        //          << value << " "
+        //          <<m_num_account_summary_response
+        //          <<std::endl;
+        
+        if(m_num_account_summary_response <= 0){
+          m_req_account_summary_signal.notify();
+        }
+          
+        // std::cout<< " redId = " << reqId
+        //          << " account = " << account
+        //          << " tag = " << tag
+        //          << " value = " << value
+        //          << " curency = " << curency
+        //          << std::endl;
         
       };
       

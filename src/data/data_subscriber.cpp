@@ -20,6 +20,18 @@ namespace wave{
       if(m_if_handle_data)
         handle_data();
     }
+
+    void data_subscriber::update_account(){
+      vec_string vs =
+        data_source_manager::global()->
+        available_data_sources();
+
+      for(auto& s : vs){
+        data_source_manager::global() ->
+          get_data_source(s) ->
+          update_account(accounts.get(s));
+      }
+    }
     
     int8 data_subscriber::subscribe_bar(
         const contract ctr,
@@ -53,6 +65,21 @@ namespace wave{
         subscribe_tick(m_data_signal, ctr);
     }
 
+    time_type data_subscriber::current_time(
+        const std::string data_source){
+      if(data_source == ""){
+        return clock::now();
+      }else{
+        return data_source_manager::global()->
+          get_data_source(data_source) ->
+          current_time();
+      }
+    }
+
+    void data_subscriber::pre_initialization(){
+      update_account();
+    }
+    
     void data_subscriber::prepare_data(){
       
     }
@@ -70,9 +97,20 @@ namespace wave{
       m_data_thread = boost::thread(
           boost::bind(&data_subscriber::on_data_thread, this));
 
+      BOOST_LOG_TRIVIAL(info) <<
+        "call pre-initialize function";
+
+      this->pre_initialization();
+
+      BOOST_LOG_TRIVIAL(info) <<
+        "call initialize function";
+      
       // intialize strategy
       this->initialize();
 
+      BOOST_LOG_TRIVIAL(info) <<
+        "preparing data...";
+      
       // prepare necessary data, e.g. historical data
       this->prepare_data();
       

@@ -16,11 +16,23 @@ namespace wave{
       DS_IDLE
     };
 
+    
     class data_source_base {
-    private:
-      account m_account;
+    protected:
+      std::string m_name;
+      wave::tag_values m_configs;
     public:
 
+      data_source_base(const std::string t_name,
+              const wave::tag_values& t_configs):
+        m_name(t_name),
+        m_configs(t_configs) {
+      }
+      
+      std::string name(){
+        return m_name;
+      }
+      
       //! connect to data source.
       virtual void connect() = 0;
 
@@ -36,6 +48,10 @@ namespace wave{
       //! clean resources. e.g. disconnect data source
       virtual void clean() = 0;
 
+      virtual time_type current_time() = 0;
+
+      virtual void update_account(account& acc) = 0;
+      
       // //! 
       // virtual void reg_bar_event(const contract& con,
       //         const std::string period) = 0;

@@ -4,6 +4,8 @@
 
 #include "../../data_source_base.hpp"
 #include "../../account.hpp"
+#include "../../../semaphore.hpp"
+#include "../../../utils.hpp"
 
 #include "official/EWrapper.h"
 #include "official/EReaderOSSignal.h"
@@ -21,6 +23,8 @@ namespace wave{
 
       // class EClientSocket;
       using namespace wave::data;
+      using namespace wave;
+      
       class data_source : public EWrapper, public data_source_base
       {
         EClientSocket* m_client;
@@ -28,17 +32,22 @@ namespace wave{
         EReader *m_pReader;
         tag_values m_tv;
         EReader* m_reader;
+
+        semaphore m_req_current_time_signal;
+        time_type m_current_time;
+
+        semaphore m_req_account_summary_signal;
+        account_summary m_account_summary;
+        int m_num_account_summary_response;
         
       public:
 
-        data_source();
-        data_source(tag_values& tv);
+        data_source(std::string t_name, tag_values& t_configs);
         
         ~data_source(){};
 
         void set_connect_options(const std::string&);
 
-        
         void connect() override ;
         
         void disconnect() override ;
@@ -49,7 +58,11 @@ namespace wave{
 
         void clean() override;
 
+        time_type current_time() override;
+        
         void process_msgs() override;
+
+        void update_account(account& acc) override;
         
         // account& get_account() override;
         

@@ -55,7 +55,7 @@ namespace wave{
         
         if(provider == "ib"){
           m_ds[config.first] = ptr_type<data_source_base>
-            (new ib::data_source(config.second));
+            (new ib::data_source(config.first, config.second));
         } else {
           LOGIC_ERROR("not supported data source type.");
         }
@@ -114,15 +114,31 @@ namespace wave{
       
       BOOST_LOG_TRIVIAL(info)
         << "starting " << m_ds.size() << " data sources.";
-      
-      
+
+
       for(auto& ds : m_ds){
         m_ds_threads[ds.first] =
           thread(bind(&data_source_base::start,
                           ds.second.get()));
-        
-        BOOST_LOG_TRIVIAL(info)
-          << "data source \"" << ds.first << "\" has started.";
+
+        //wait until connection is established.
+        int elapsed = 0;
+        // timeout for connection is 3 seconds        
+        while(!m_ds[ds.first]->is_connected() &&
+                elapsed < 3000){
+          this_thread::sleep(posix_time::milliseconds(50));
+          elapsed += 50;
+        }
+
+        if(m_ds[ds.first]->is_connected()){
+          BOOST_LOG_TRIVIAL(info)
+            << "data source \"" << ds.first
+            << "\" has started.";
+        } else {
+          BOOST_LOG_TRIVIAL(warning)
+            << "data source \"" << ds.first
+            << "\" failed to start, timeout.";
+        }
       }
     }
 

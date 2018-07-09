@@ -16,5 +16,6 @@
 #include "data/tick.hpp"
 #include "strategy/strategy_manager.hpp"
 #include "utils.hpp"
+#include "initialize.hpp"
 
 #endif

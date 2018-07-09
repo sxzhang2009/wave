@@ -13,7 +13,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/filesystem.hpp>
-
+#include <boost/format.hpp>
 #include <unordered_map>
 
 namespace wave{
@@ -47,10 +47,12 @@ namespace wave{
 
 #include <boost/exception/all.hpp>
 
+#include "error.hpp"
+
 #define LOGIC_ERROR(x)                          \
-  BOOST_THROW_EXCEPTION(std::logic_error(x))
+  BOOST_THROW_EXCEPTION(wave::logic_error(x))
 
 #define RUNTIME_ERROR(x)                        \
-  BOOST_THROW_EXCEPTION(std::runtime_error(x))
+  BOOST_THROW_EXCEPTION(wave::runtime_error(x))
 
 #endif
